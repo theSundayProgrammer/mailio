@@ -19,3 +19,11 @@ smtp conn(io_service, "smtp.gmail.com", 587);
 conn.authenticate("mailio@gmail.com", "mailiopass", smtp::auth_method_t::LOGIN);
 conn.submit(msg);
 ```
+The examples in the example folder compiles but the values such as server name, user name and password needs to be fixed
+# Build Instructions
+Asio header files must be added to the include folder
+Boost header files are also needed for date-time functions.
+When gcc implements some of the missing chrono functions I can remove the need for Boost.
+Openssl, both dev and runtime need to be ----------
+
+
