@@ -765,7 +765,7 @@ protected:
     headers_t headers_;
 };
 
-[[deprecated]]
+//[[deprecated]]
 typedef mime_error message_error;
 
 

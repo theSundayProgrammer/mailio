@@ -267,67 +267,6 @@ protected:
 /**
 Secure version of SMTP client.
 **/
-class MAILIO_DEPRECATED smtps : public smtp
-{
-public:
-
-    /**
-    Available authentication methods over the TLS connection.
-
-    The following mechanisms are allowed:
-    - NONE: No username or password are required, so just use the empty strings when authenticating. Nowadays, it's not probably that such authentication
-      mechanism is allowed.
-    - LOGIN: The username and password are sent in Base64 format.
-    - START_TLS: For the TCP connection, a TLS negotiation is asked before sending the login parameters.
-    **/
-    enum class auth_method_t {NONE, LOGIN, START_TLS};
-
-    /**
-    Making a connection to the server.
-
-    Parent constructor is called to do all the work.
-
-    @param ios asio io io_context
-    @param hostname Hostname of the server.
-    @param port     Port of the server.
-    @param timeout  Network timeout after which I/O operations fail. If zero, then no timeout is set i.e. I/O operations are synchronous.
-    @throw *        `smtp::smtp(const string&, unsigned)`.
-    **/
-    smtps(asio::io_context& ios,const std::string& hostname, unsigned port, std::chrono::milliseconds timeout = std::chrono::milliseconds(0));
-
-    /**
-    Sending the quit command and closing the connection.
-
-    Parent destructor is called to do all the work.
-    **/
-    ~smtps() = default;
-
-    smtps(const smtps&) = delete;
-
-    smtps(smtps&&) = delete;
-
-    void operator=(const smtps&) = delete;
-
-    void operator=(smtps&&) = delete;
-
-    /**
-    Authenticating with the given credentials.
-
-    @param username Username to authenticate.
-    @param password Password to authenticate.
-    @param method   Authentication method to use.
-    @return         The server greeting message.
-    @throw *        `start_tls()`, `switch_to_ssl()`, `ehlo()`, `auth_login(const string&, const string&)`, `connect()`.
-    **/
-    std::string authenticate(const std::string& username, const std::string& password, auth_method_t method);
-
-    /**
-    Setting SSL options.
-
-    @param options SSL options to set.
-    **/
-    void ssl_options(const dialog_ssl::ssl_options_t& options);
-};
 
 
 /**

@@ -476,10 +476,10 @@ public:
 
     @param encoder_line_policy Encoder line policy to set.
     @param decoder_line_policy Decoder line policy to set.
-    **/
     [[deprecated]]
     void line_policy(codec::line_len_policy_t encoder_line_policy, codec::line_len_policy_t decoder_line_policy);
 
+    **/
     /**
     Setting the message decoding and encoding line policy.
 

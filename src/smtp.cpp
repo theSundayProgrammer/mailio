@@ -333,47 +333,6 @@ inline bool smtp::permanent_negative(int status)
     return status / 100 == smtp_status_t::PERMANENT_NEGATIVE;
 }
 
-
-smtps::smtps(asio::io_context& ios,const string& hostname, unsigned port, milliseconds timeout) :
-    smtp(ios,hostname, port, timeout)
-{
-    ssl_options_ =
-        {
-            asio::ssl::context::sslv23,
-            asio::ssl::verify_none
-        };
-    is_start_tls_ = false;
-}
-
-
-string smtps::authenticate(const string& username, const string& password, auth_method_t method)
-{
-    string greeting;
-    if (method == auth_method_t::NONE)
-    {
-        is_start_tls_ = false;
-        greeting = smtp::authenticate(username, password, smtp::auth_method_t::NONE);
-    }
-    else if (method == auth_method_t::LOGIN)
-    {
-        is_start_tls_ = false;
-        greeting = smtp::authenticate(username, password, smtp::auth_method_t::LOGIN);
-    }
-    else if (method == auth_method_t::START_TLS)
-    {
-        is_start_tls_ = true;
-        greeting = smtp::authenticate(username, password, smtp::auth_method_t::LOGIN);
-    }
-    return greeting;
-}
-
-
-void smtps::ssl_options(const dialog_ssl::ssl_options_t& options)
-{
-    ssl_options_ = options;
-}
-
-
 smtp_error::smtp_error(const string& msg, const string& details) : dialog_error(msg, details)
 {
 }
