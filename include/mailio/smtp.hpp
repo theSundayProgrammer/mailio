@@ -63,7 +63,7 @@ public:
 
     /**
     Making a connection to the server.
-    @param ios asio io io_context
+    @param ios        asio io_context
     @param hostname   Hostname of the server.
     @param port       Port of the server.
     @param timeout    Network timeout after which I/O operations fail. If zero, then no timeout is set i.e. I/O operations are synchronous.
