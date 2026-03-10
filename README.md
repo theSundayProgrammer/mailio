@@ -5,7 +5,7 @@ This is a small C++ library that I forked from https://github.com/karastojko/mai
 2. Reduced Boost dependencies. Specifically,
   1. using std::regex instead of boost::regex
   2. using standalone asio (https://think-async.com/Asio/) instead of boost::asio. Reverting to boost::asio should be straigthforward.
-3. asio::io_context was declared as a static variable in dialog.cpp. It is now passed as a parameter. The main motivation was to use it a web server developed around asio.
+3. asio::io_context was declared as a static variable in dialog.cpp. It is now passed as a parameter. The main motivation was to use it in a web server developed around asio.
 # Example
 The following example is adapted from Karastojko to use io_context as a parameter
 ```CPP
@@ -24,6 +24,6 @@ The examples in the example folder compiles but the values such as server name, 
 Asio header files must be added to the include folder
 Boost header files are also needed for date-time functions.
 When gcc implements some of the missing chrono functions I can remove the need for Boost.
-Openssl, both dev and runtime need to be ----------
+Openssl, both dev and runtime need to be installed. 
 
 
