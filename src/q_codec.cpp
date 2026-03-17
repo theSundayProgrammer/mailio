@@ -18,7 +18,6 @@ copy at http://www.freebsd.org/copyright/freebsd-license.html.
 
 
 using boost::iequals;
-using std::string;
 using std::vector;
 using std::tuple;
 using std::make_tuple;
@@ -30,22 +29,22 @@ namespace mailio
 {
 
 
-const string q_codec::BASE64_CODEC_STR = "B";
-const string q_codec::QP_CODEC_STR = "Q";
+const std::string q_codec::BASE64_CODEC_STR = "B";
+const std::string q_codec::QP_CODEC_STR = "Q";
 
 
-q_codec::q_codec(string::size_type line1_policy, string::size_type lines_policy) :
+q_codec::q_codec(std::string::size_type line1_policy, std::string::size_type lines_policy) :
     codec(line1_policy, lines_policy)
 {
 }
 
 
-vector<string> q_codec::encode(const string& text, const string& charset, codec_t method) const
+vector<std::string> q_codec::encode(const std::string& text, const std::string& charset, codec_t method) const
 {
     // TODO: The constant has to depend of the header length.
-    const string::size_type Q_FLAGS_LEN = 12;
-    vector<string> enc_text, text_c;
-    string codec_flag;
+    const std::string::size_type Q_FLAGS_LEN = 12;
+    vector<std::string> enc_text, text_c;
+    std::string codec_flag;
     if (method == codec_t::BASE64)
     {
         codec_flag = BASE64_CODEC_STR;
@@ -70,25 +69,25 @@ vector<string> q_codec::encode(const string& text, const string& charset, codec_
 }
 
 
-tuple<string, string, codec::codec_t> q_codec::decode(const string& text) const
+tuple<std::string, std::string, codec::codec_t> q_codec::decode(const std::string& text) const
 {
-    string::size_type charset_pos = text.find(QUESTION_MARK_CHAR);
-    if (charset_pos == string::npos)
+    std::string::size_type charset_pos = text.find(QUESTION_MARK_CHAR);
+    if (charset_pos == std::string::npos)
         throw codec_error("Missing Q codec separator for charset.");
-    string::size_type method_pos = text.find(QUESTION_MARK_CHAR, charset_pos + 1);
-    if (method_pos == string::npos)
+    std::string::size_type method_pos = text.find(QUESTION_MARK_CHAR, charset_pos + 1);
+    if (method_pos == std::string::npos)
         throw codec_error("Missing Q codec separator for codec type.");
-    string charset = to_upper_copy(text.substr(charset_pos + 1, method_pos - charset_pos - 1));
+    std::string charset = to_upper_copy(text.substr(charset_pos + 1, method_pos - charset_pos - 1));
     if (charset.empty())
         throw codec_error("Missing Q codec charset.");
-    string::size_type content_pos = text.find(QUESTION_MARK_CHAR, method_pos + 1);
-    if (content_pos == string::npos)
+    std::string::size_type content_pos = text.find(QUESTION_MARK_CHAR, method_pos + 1);
+    if (content_pos == std::string::npos)
         throw codec_error("Missing last Q codec separator.");
-    string method = text.substr(method_pos + 1, content_pos - method_pos - 1);
+    std::string method = text.substr(method_pos + 1, content_pos - method_pos - 1);
     codec_t method_type;
-    string text_c = text.substr(content_pos + 1);
+    std::string text_c = text.substr(content_pos + 1);
 
-    string dec_text;
+    std::string dec_text;
     if (iequals(method, BASE64_CODEC_STR))
     {
         base64 b64(line1_policy_, lines_policy_);
@@ -107,13 +106,13 @@ tuple<string, string, codec::codec_t> q_codec::decode(const string& text) const
 }
 
 
-tuple<string, string, codec::codec_t> q_codec::check_decode(const string& text) const
+tuple<std::string, std::string, codec::codec_t> q_codec::check_decode(const std::string& text) const
 {
-    string::size_type question_mark_counter = 0;
-    const string::size_type QUESTION_MARKS_NO = 4;
+    std::string::size_type question_mark_counter = 0;
+    const std::string::size_type QUESTION_MARKS_NO = 4;
     bool is_encoded = false;
-    string dec_text, encoded_part;
-    string charset = CHARSET_ASCII;
+    std::string dec_text, encoded_part;
+    std::string charset = CHARSET_ASCII;
     // If there is no q encoding, then it's ascii or utf8.
     codec_t method_type = codec_t::ASCII;
 
@@ -149,11 +148,11 @@ tuple<string, string, codec::codec_t> q_codec::check_decode(const string& text) 
 }
 
 
-string q_codec::decode_qp(const string& text) const
+std::string q_codec::decode_qp(const std::string& text) const
 {
     quoted_printable qp(line1_policy_, lines_policy_);
     qp.q_codec_mode(true);
-    vector<string> lines;
+    vector<std::string> lines;
     lines.push_back(text);
     return qp.decode(lines);
 }

@@ -24,7 +24,6 @@ copy at http://www.freebsd.org/copyright/freebsd-license.html.
 using std::ostream;
 using std::istream;
 using std::vector;
-using std::string;
 using std::to_string;
 using std::tuple;
 using std::stoi;
@@ -42,7 +41,7 @@ namespace mailio
 {
 
 
-smtp::smtp(asio::io_context& ios, const string& hostname, unsigned port, milliseconds timeout) :
+smtp::smtp(asio::io_context& ios, const std::string& hostname, unsigned port, milliseconds timeout) :
     dlg_(make_shared<dialog>(ios,hostname, port, timeout)), is_start_tls_(true)
 {
     ssl_options_ =
@@ -67,12 +66,12 @@ smtp::~smtp()
 }
 
 
-string smtp::authenticate(const string& username, const string& password, auth_method_t method)
+std::string smtp::authenticate(const std::string& username, const std::string& password, auth_method_t method)
 {
     if (ssl_options_.has_value() && !is_start_tls_)
         dlg_ = dialog_ssl::to_ssl(dlg_, *ssl_options_);
 
-    string greeting = connect();
+    std::string greeting = connect();
     ehlo();
     if (is_start_tls_) 
     {
@@ -88,14 +87,14 @@ string smtp::authenticate(const string& username, const string& password, auth_m
 }
 
 
-string smtp::submit(const message& msg)
+std::string smtp::submit(const message& msg)
 {
     if (!msg.sender().address.empty())
         dlg_->send("MAIL FROM: " + message::ADDRESS_BEGIN_STR + msg.sender().address + message::ADDRESS_END_STR);
     else
         dlg_->send("MAIL FROM: " + message::ADDRESS_BEGIN_STR + msg.from().addresses.at(0).address + message::ADDRESS_END_STR);
-    string line = dlg_->receive();
-    tuple<int, bool, string> tokens = parse_line(line);
+    std::string line = dlg_->receive();
+    tuple<int, bool, std::string> tokens = parse_line(line);
     if (std::get<1>(tokens) && !positive_completion(std::get<0>(tokens)))
         throw smtp_error("Mail sender rejection.", std::get<2>(tokens));
 
@@ -159,7 +158,7 @@ string smtp::submit(const message& msg)
     if (!positive_intermediate(std::get<0>(tokens)))
         throw smtp_error("Mail message rejection.", std::get<2>(tokens));
 
-    string msg_str;
+    std::string msg_str;
     msg.format(msg_str, {/*dot_escape*/true});
     dlg_->send(msg_str + codec::END_OF_LINE + codec::END_OF_MESSAGE);
     line = dlg_->receive();
@@ -170,13 +169,13 @@ string smtp::submit(const message& msg)
 }
 
 
-void smtp::source_hostname(const string& src_host)
+void smtp::source_hostname(const std::string& src_host)
 {
     src_host_ = src_host;
 }
 
 
-string smtp::source_hostname() const
+std::string smtp::source_hostname() const
 {
     return src_host_;
 }
@@ -194,11 +193,11 @@ void smtp::ssl_options(const std::optional<dialog_ssl::ssl_options_t> options)
 }
 
 
-string smtp::connect()
+std::string smtp::connect()
 {
-    string greeting;
-    string line = dlg_->receive();
-    tuple<int, bool, string> tokens = parse_line(line);
+    std::string greeting;
+    std::string line = dlg_->receive();
+    tuple<int, bool, std::string> tokens = parse_line(line);
     while (!std::get<1>(tokens))
     {
         greeting += std::get<2>(tokens) + to_string(codec::CR_CHAR) + to_string(codec::LF_CHAR);
@@ -212,18 +211,18 @@ string smtp::connect()
 }
 
 
-void smtp::auth_login(const string& username, const string& password)
+void smtp::auth_login(const std::string& username, const std::string& password)
 {
     dlg_->send("AUTH LOGIN");
-    string line = dlg_->receive();
-    tuple<int, bool, string> tokens = parse_line(line);
+    std::string line = dlg_->receive();
+    tuple<int, bool, std::string> tokens = parse_line(line);
     if (std::get<1>(tokens) && !positive_intermediate(std::get<0>(tokens)))
         throw smtp_error("Authentication rejection.", std::get<2>(tokens));
 
     // TODO: Use static encode from the Base64 codec.
-    base64 b64(static_cast<string::size_type>(codec::line_len_policy_t::RECOMMENDED), static_cast<string::size_type>(codec::line_len_policy_t::RECOMMENDED));
+    base64 b64(static_cast<std::string::size_type>(codec::line_len_policy_t::RECOMMENDED), static_cast<std::string::size_type>(codec::line_len_policy_t::RECOMMENDED));
     auto user_v = b64.encode(username);
-    string cmd = user_v.empty() ? "" : user_v[0];
+    std::string cmd = user_v.empty() ? "" : user_v[0];
     dlg_->send(cmd);
     line = dlg_->receive();
     tokens = parse_line(line);
@@ -243,8 +242,8 @@ void smtp::auth_login(const string& username, const string& password)
 void smtp::ehlo()
 {
     dlg_->send("EHLO " + src_host_);
-    string line = dlg_->receive();
-    tuple<int, bool, string> tokens = parse_line(line);
+    std::string line = dlg_->receive();
+    tuple<int, bool, std::string> tokens = parse_line(line);
     while (!std::get<1>(tokens))
     {
         line = dlg_->receive();
@@ -268,7 +267,7 @@ void smtp::ehlo()
 }
 
 
-string smtp::read_hostname()
+std::string smtp::read_hostname()
 {
     try
     {
@@ -284,8 +283,8 @@ string smtp::read_hostname()
 void smtp::switch_tls()
 {
     dlg_->send("STARTTLS");
-    string line = dlg_->receive();
-    tuple<int, bool, string> tokens = parse_line(line);
+    std::string line = dlg_->receive();
+    tuple<int, bool, std::string> tokens = parse_line(line);
     if (std::get<1>(tokens) && std::get<0>(tokens) != SERVICE_READY_STATUS)
         throw smtp_error("Start tls refused by server.", std::get<2>(tokens));
 
@@ -293,7 +292,7 @@ void smtp::switch_tls()
 }
 
 
-tuple<int, bool, string> smtp::parse_line(const string& line)
+tuple<int, bool, std::string> smtp::parse_line(const std::string& line)
 {
     try
     {
@@ -333,12 +332,13 @@ inline bool smtp::permanent_negative(int status)
     return status / 100 == smtp_status_t::PERMANENT_NEGATIVE;
 }
 
-smtp_error::smtp_error(const string& msg, const string& details) : dialog_error(msg, details)
+
+smtp_error::smtp_error(const std::string& msg, const std::string& details) : dialog_error(msg, details)
 {
 }
 
 
-smtp_error::smtp_error(const char* msg, const string& details) : dialog_error(msg, details)
+smtp_error::smtp_error(const char* msg, const std::string& details) : dialog_error(msg, details)
 {
 }
 

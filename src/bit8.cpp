@@ -17,7 +17,6 @@ copy at http://www.freebsd.org/copyright/freebsd-license.html.
 #include <mailio/bit8.hpp>
 
 
-using std::string;
 using std::vector;
 using boost::trim_right;
 
@@ -26,20 +25,20 @@ namespace mailio
 {
 
 
-bit8::bit8(string::size_type line1_policy, string::size_type lines_policy) :
+bit8::bit8(std::string::size_type line1_policy, std::string::size_type lines_policy) :
     codec(line1_policy, lines_policy)
 {
 }
 
 
-vector<string> bit8::encode(const string& text) const
+vector<std::string> bit8::encode(const std::string& text) const
 {
-    vector<string> enc_text;
-    string line;
-    string::size_type line_len = 0;
+    vector<std::string> enc_text;
+    std::string line;
+    std::string::size_type line_len = 0;
     bool is_first_line = true;
 
-    auto add_new_line = [&enc_text, &line_len](string& line)
+    auto add_new_line = [&enc_text, &line_len](std::string& line)
     {
         enc_text.push_back(line);
         line.clear();
@@ -60,7 +59,7 @@ vector<string> bit8::encode(const string& text) const
             ch++;
         }
         else
-            throw codec_error("Bad character `" + string(1, *ch) + "`.");
+            throw codec_error("Bad character `" + std::string(1, *ch) + "`.");
 
         if (is_first_line)
         {
@@ -85,9 +84,9 @@ vector<string> bit8::encode(const string& text) const
 
 
 // TODO: Consider the first line policy.
-string bit8::decode(const vector<string>& text) const
+std::string bit8::decode(const vector<std::string>& text) const
 {
-    string dec_text;
+    std::string dec_text;
     for (const auto& line : text)
     {
         if (line.length() > lines_policy_)
@@ -96,7 +95,7 @@ string bit8::decode(const vector<string>& text) const
         for (auto ch : line)
         {
             if (!is_allowed(ch))
-                throw codec_error("Bad character `" + string(1, ch) + "`.");
+                throw codec_error("Bad character `" + std::string(1, ch) + "`.");
 
             dec_text += ch;
         }

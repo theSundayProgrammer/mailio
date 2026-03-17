@@ -18,8 +18,6 @@ copy at http://www.freebsd.org/copyright/freebsd-license.html.
 #include <mailio/percent.hpp>
 
 
-using std::string;
-using std::stringstream;
 using std::vector;
 using boost::to_upper_copy;
 
@@ -28,23 +26,23 @@ namespace mailio
 {
 
 
-percent::percent(string::size_type line1_policy, string::size_type lines_policy) :
+percent::percent(std::string::size_type line1_policy, std::string::size_type lines_policy) :
     codec(line1_policy, lines_policy)
 {
 }
 
 
-vector<string> percent::encode(const string& txt, const string& charset) const
+vector<std::string> percent::encode(const std::string& txt, const std::string& charset) const
 {
-    vector<string> enc_text;
-    string line;
-    string::size_type line_len = 0;
+    vector<std::string> enc_text;
+    std::string line;
+    std::string::size_type line_len = 0;
     // Soon as the first line is added, switch the policy to the other lines policy.
-    string::size_type policy = line1_policy_;
+    std::string::size_type policy = line1_policy_;
 
-    stringstream enc_line;
+    std::stringstream enc_line;
     enc_line << to_upper_copy(charset) + ATTRIBUTE_CHARSET_SEPARATOR_STR + ATTRIBUTE_CHARSET_SEPARATOR_STR;
-    for (string::const_iterator ch = txt.begin(); ch != txt.end(); ch++)
+    for (std::string::const_iterator ch = txt.begin(); ch != txt.end(); ch++)
     {
         if (isalnum(*ch))
         {
@@ -72,10 +70,10 @@ vector<string> percent::encode(const string& txt, const string& charset) const
 }
 
 
-string percent::decode(const string& txt) const
+std::string percent::decode(const std::string& txt) const
 {
-    string dec_text;
-    for (string::const_iterator ch = txt.begin(); ch != txt.end(); ch++)
+    std::string dec_text;
+    for (std::string::const_iterator ch = txt.begin(); ch != txt.end(); ch++)
     {
         if (*ch == codec::PERCENT_HEX_FLAG)
         {

@@ -19,7 +19,6 @@ copy at http://www.freebsd.org/copyright/freebsd-license.html.
 #include <mailio/quoted_printable.hpp>
 
 
-using std::string;
 using std::vector;
 using std::runtime_error;
 using boost::trim_right;
@@ -29,24 +28,24 @@ namespace mailio
 {
 
 
-quoted_printable::quoted_printable(string::size_type line1_policy, string::size_type lines_policy) :
+quoted_printable::quoted_printable(std::string::size_type line1_policy, std::string::size_type lines_policy) :
     codec(line1_policy, lines_policy), q_codec_mode_(false)
 {
 }
 
 
-vector<string> quoted_printable::encode(const string& text) const
+vector<std::string> quoted_printable::encode(const std::string& text) const
 {
-    vector<string> enc_text;
-    string line;
-    string::size_type line_len = 0;
+    vector<std::string> enc_text;
+    std::string line;
+    std::string::size_type line_len = 0;
     // Soon as the first line is added, switch the policy to the other lines policy.
-    string::size_type policy = line1_policy_;
+    std::string::size_type policy = line1_policy_;
     std::stringstream strstream;
     strstream << std::hex << static_cast<int>(QUESTION_MARK_CHAR);
-    const string QMARK_HEX = EQUAL_STR + strstream.str();
+    const std::string QMARK_HEX = EQUAL_STR + strstream.str();
 
-    auto add_new_line = [&enc_text, &line_len, &policy, this](string& line)
+    auto add_new_line = [&enc_text, &line_len, &policy, this](std::string& line)
     {
         enc_text.push_back(line);
         line.clear();
@@ -160,7 +159,7 @@ vector<string> quoted_printable::encode(const string& text) const
         else if (*ch == CR_CHAR)
         {
             if (q_codec_mode_)
-                throw codec_error("Bad character `" + string(1, *ch) + "`.");
+                throw codec_error("Bad character `" + std::string(1, *ch) + "`.");
 
             if (ch + 1 == text.end() || (ch + 1 != text.end() && *(ch + 1) != LF_CHAR))
                 throw codec_error("Bad CRLF sequence.");
@@ -172,7 +171,7 @@ vector<string> quoted_printable::encode(const string& text) const
         {
             // Encode the character.
 
-            auto encode_char = [this, &policy, &line_len, &enc_text](char ch, string& line)
+            auto encode_char = [this, &policy, &line_len, &enc_text](char ch, std::string& line)
             {
                 enc_text.push_back(line);
                 line.clear();
@@ -208,19 +207,19 @@ vector<string> quoted_printable::encode(const string& text) const
 }
 
 
-string quoted_printable::decode(const vector<string>& text) const
+std::string quoted_printable::decode(const vector<std::string>& text) const
 {
-    string dec_text;
+    std::string dec_text;
     for (const auto& line : text)
     {
         if (line.length() > lines_policy_ - 2)
             throw codec_error("Bad line policy.");
 
         bool soft_break = false;
-        for (string::const_iterator ch = line.begin(); ch != line.end(); ch++)
+        for (std::string::const_iterator ch = line.begin(); ch != line.end(); ch++)
         {
             if (!is_allowed(*ch))
-                throw codec_error("Bad character `" + string(1, *ch) + "`.");
+                throw codec_error("Bad character `" + std::string(1, *ch) + "`.");
 
             if (*ch == EQUAL_CHAR)
             {
@@ -236,7 +235,7 @@ string quoted_printable::decode(const vector<string>& text) const
                 if (!is_allowed(next_char) || !is_allowed(next_next_char))
                     throw codec_error("Bad character.");
 
-                if (HEX_DIGITS.find(next_char) == string::npos || HEX_DIGITS.find(next_next_char) == string::npos)
+                if (HEX_DIGITS.find(next_char) == std::string::npos || HEX_DIGITS.find(next_next_char) == std::string::npos)
                     throw codec_error("Bad hexadecimal digit.");
                 int nc_val = hex_digit_to_int(next_char);
                 int nnc_val = hex_digit_to_int(next_next_char);

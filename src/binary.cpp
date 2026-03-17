@@ -16,7 +16,6 @@ copy at http://www.freebsd.org/copyright/freebsd-license.html.
 #include <mailio/binary.hpp>
 
 
-using std::string;
 using std::vector;
 
 
@@ -24,23 +23,23 @@ namespace mailio
 {
 
 
-binary::binary(string::size_type line1_policy, string::size_type lines_policy) :
+binary::binary(std::string::size_type line1_policy, std::string::size_type lines_policy) :
     codec(line1_policy, lines_policy)
 {
 }
 
 
-vector<string> binary::encode(const string& text) const
+vector<std::string> binary::encode(const std::string& text) const
 {
-    vector<string> enc_text;
+    vector<std::string> enc_text;
     enc_text.push_back(text);
     return enc_text;
 }
 
 
-string binary::decode(const vector<string>& text) const
+std::string binary::decode(const vector<std::string>& text) const
 {
-    string dec_text;
+    std::string dec_text;
     for (const auto& line : text)
         dec_text += line + END_OF_LINE;
     return dec_text;

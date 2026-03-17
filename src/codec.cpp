@@ -16,27 +16,26 @@ copy at http://www.freebsd.org/copyright/freebsd-license.html.
 #include <mailio/codec.hpp>
 
 
-using std::string;
 
 
 namespace mailio
 {
 
-const string codec::HEX_DIGITS{"0123456789ABCDEF"};
-const string codec::END_OF_LINE{"\r\n"};
-const string codec::END_OF_MESSAGE{"."};
-const string codec::EQUAL_STR(1, codec::EQUAL_CHAR);
-const string codec::SPACE_STR(1, codec::SPACE_CHAR);
-const string codec::DOT_STR(1, codec::DOT_CHAR);
-const string codec::COMMA_STR(1, codec::COMMA_CHAR);
-const string codec::COLON_STR(1, codec::COLON_CHAR);
-const string codec::SEMICOLON_STR(1, codec::SEMICOLON_CHAR);
-const string codec::QUOTE_STR(1, codec::QUOTE_CHAR);
-const string codec::LESS_THAN_STR(1, codec::LESS_THAN_CHAR);
-const string codec::GREATER_THAN_STR(1, codec::GREATER_THAN_CHAR);
-const string codec::CHARSET_ASCII("ASCII");
-const string codec::CHARSET_UTF8("UTF-8");
-const string codec::ATTRIBUTE_CHARSET_SEPARATOR_STR(1, codec::ATTRIBUTE_CHARSET_SEPARATOR);
+const std::string codec::HEX_DIGITS{"0123456789ABCDEF"};
+const std::string codec::END_OF_LINE{"\r\n"};
+const std::string codec::END_OF_MESSAGE{"."};
+const std::string codec::EQUAL_STR(1, codec::EQUAL_CHAR);
+const std::string codec::SPACE_STR(1, codec::SPACE_CHAR);
+const std::string codec::DOT_STR(1, codec::DOT_CHAR);
+const std::string codec::COMMA_STR(1, codec::COMMA_CHAR);
+const std::string codec::COLON_STR(1, codec::COLON_CHAR);
+const std::string codec::SEMICOLON_STR(1, codec::SEMICOLON_CHAR);
+const std::string codec::QUOTE_STR(1, codec::QUOTE_CHAR);
+const std::string codec::LESS_THAN_STR(1, codec::LESS_THAN_CHAR);
+const std::string codec::GREATER_THAN_STR(1, codec::GREATER_THAN_CHAR);
+const std::string codec::CHARSET_ASCII("ASCII");
+const std::string codec::CHARSET_UTF8("UTF-8");
+const std::string codec::ATTRIBUTE_CHARSET_SEPARATOR_STR(1, codec::ATTRIBUTE_CHARSET_SEPARATOR);
 
 
 int codec::hex_digit_to_int(char digit)
@@ -51,7 +50,7 @@ bool codec::is_8bit_char(char ch)
 }
 
 
-bool codec::is_utf8_string(const string& txt)
+bool codec::is_utf8_string(const std::string& txt)
 {
     for (auto ch : txt)
         if (static_cast<unsigned>(ch) > 127)
@@ -60,12 +59,12 @@ bool codec::is_utf8_string(const string& txt)
 }
 
 
-string codec::escape_string(const string& text, const string& escaping_chars)
+std::string codec::escape_string(const std::string& text, const std::string& escaping_chars)
 {
-    string esc_str;
+    std::string esc_str;
     esc_str.reserve(text.size());
     std::for_each(text.begin(), text.end(), [&](char ch) {
-        if (escaping_chars.find(ch) != string::npos)
+        if (escaping_chars.find(ch) != std::string::npos)
             esc_str += "\\";
         esc_str += ch;
     });
@@ -73,13 +72,13 @@ string codec::escape_string(const string& text, const string& escaping_chars)
 }
 
 
-string codec::surround_string(const string& text, char surround_char)
+std::string codec::surround_string(const std::string& text, char surround_char)
 {
     return surround_char + text + surround_char;
 }
 
 
-codec::codec(string::size_type line1_policy, string::size_type lines_policy) :
+codec::codec(std::string::size_type line1_policy, std::string::size_type lines_policy) :
     line1_policy_(line1_policy), lines_policy_(lines_policy), strict_mode_(false)
 {
 }

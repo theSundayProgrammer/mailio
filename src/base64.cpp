@@ -16,7 +16,6 @@ copy at http://www.freebsd.org/copyright/freebsd-license.html.
 #include <mailio/base64.hpp>
 
 
-using std::string;
 using std::vector;
 using boost::trim_right;
 
@@ -25,10 +24,10 @@ namespace mailio
 {
 
 
-const string base64::CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const std::string base64::CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 
-base64::base64(string::size_type line1_policy, string::size_type lines_policy) :
+base64::base64(std::string::size_type line1_policy, std::string::size_type lines_policy) :
     codec(line1_policy, lines_policy)
 {
     // Line policies to be divisible by four.
@@ -37,17 +36,17 @@ base64::base64(string::size_type line1_policy, string::size_type lines_policy) :
 }
 
 
-vector<string> base64::encode(const string& text) const
+vector<std::string> base64::encode(const std::string& text) const
 {
-    vector<string> enc_text;
+    vector<std::string> enc_text;
     unsigned char octets[OCTETS_NO];
     unsigned char sextets[SEXTETS_NO];
     int sextets_counter = 0;
-    string line;
-    string::size_type line_len = 0;
-    string::size_type policy = line1_policy_;
+    std::string line;
+    std::string::size_type line_len = 0;
+    std::string::size_type policy = line1_policy_;
 
-    auto add_new_line = [&enc_text, &line_len, &policy, this](string& line)
+    auto add_new_line = [&enc_text, &line_len, &policy, this](std::string& line)
     {
         enc_text.push_back(line);
         line.clear();
@@ -55,7 +54,7 @@ vector<string> base64::encode(const string& text) const
         policy = lines_policy_;
     };
 
-    for (string::size_type cur_char = 0; cur_char < text.length(); cur_char++)
+    for (std::string::size_type cur_char = 0; cur_char < text.length(); cur_char++)
     {
         octets[sextets_counter++] = text[cur_char];
         if (sextets_counter == OCTETS_NO)
@@ -116,9 +115,9 @@ vector<string> base64::encode(const string& text) const
 }
 
 
-string base64::decode(const vector<string>& text) const
+std::string base64::decode(const vector<std::string>& text) const
 {
-    string dec_text;
+    std::string dec_text;
     unsigned char sextets[SEXTETS_NO];
     unsigned char octets[OCTETS_NO];
     int count_4_chars = 0;
@@ -128,10 +127,10 @@ string base64::decode(const vector<string>& text) const
         if (line.length() > lines_policy_)
             throw codec_error("Bad line policy.");
 
-        for (string::size_type ch = 0; ch < line.length() && line[ch] != EQUAL_CHAR; ch++)
+        for (std::string::size_type ch = 0; ch < line.length() && line[ch] != EQUAL_CHAR; ch++)
         {
             if (!is_allowed(line[ch]))
-                throw codec_error("Bad character `" + string(1, line[ch]) + "`.");
+                throw codec_error("Bad character `" + std::string(1, line[ch]) + "`.");
 
             sextets[count_4_chars++] = line[ch];
             if (count_4_chars == SEXTETS_NO)
@@ -172,9 +171,9 @@ string base64::decode(const vector<string>& text) const
 }
 
 
-string base64::decode(const string& text) const
+std::string base64::decode(const std::string& text) const
 {
-    vector<string> v;
+    vector<std::string> v;
     v.push_back(text);
     return decode(v);
 }

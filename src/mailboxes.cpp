@@ -14,7 +14,6 @@ copy at http://www.freebsd.org/copyright/freebsd-license.html.
 #include "mailio/mailboxes.hpp"
 
 
-using std::string;
 using std::vector;
 
 
@@ -22,7 +21,7 @@ namespace mailio
 {
 
 
-mail_address::mail_address(const string_t& mail_name, const string& mail_address) : name(mail_name), address(mail_address)
+mail_address::mail_address(const string_t& mail_name, const std::string& mail_address) : name(mail_name), address(mail_address)
 {
 }
 
@@ -40,7 +39,7 @@ void mail_address::clear()
 }
 
 
-mail_group::mail_group(const string& group_name, const vector<mail_address>& group_mails) : name(group_name), members(group_mails)
+mail_group::mail_group(const std::string& group_name, const vector<mail_address>& group_mails) : name(group_name), members(group_mails)
 {
 }
 

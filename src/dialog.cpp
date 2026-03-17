@@ -18,7 +18,6 @@ copy at http://www.freebsd.org/copyright/freebsd-license.html.
 #include <mailio/dialog.hpp>
 
 
-using std::string;
 using std::to_string;
 using std::move;
 using std::istream;
@@ -44,7 +43,7 @@ namespace mailio
 
 
 
-dialog::dialog(io_context& ios,const string& hostname, unsigned port, milliseconds timeout) : std::enable_shared_from_this<dialog>(),
+dialog::dialog(io_context& ios,const std::string& hostname, unsigned port, milliseconds timeout) : std::enable_shared_from_this<dialog>(),
     ios_(ios),hostname_(hostname), port_(port), socket_(make_shared<tcp::socket>(ios_)), timer_(make_shared<steady_timer>(ios_)),
     timeout_(timeout), timer_expired_(false), strmbuf_(make_shared<streambuf>()), istrm_(make_shared<istream>(strmbuf_.get()))
 {
@@ -84,7 +83,7 @@ void dialog::connect()
 }
 
 
-void dialog::send(const string& line)
+void dialog::send(const std::string& line)
 {
     if (timeout_.count() == 0)
         send_sync(*socket_, line);
@@ -94,7 +93,7 @@ void dialog::send(const string& line)
 
 
 // TODO: perhaps the implementation should be common with `receive_raw()`
-string dialog::receive(bool raw)
+std::string dialog::receive(bool raw)
 {
     if (timeout_.count() == 0)
         return receive_sync(*socket_, raw);
@@ -104,11 +103,11 @@ string dialog::receive(bool raw)
 
 
 template<typename Socket>
-void dialog::send_sync(Socket& socket, const string& line)
+void dialog::send_sync(Socket& socket, const std::string& line)
 {
     try
     {
-        string l = line + "\r\n";
+        std::string l = line + "\r\n";
         write(socket, buffer(l, l.size()));
     }
     catch (const system_error& exc)
@@ -119,12 +118,12 @@ void dialog::send_sync(Socket& socket, const string& line)
 
 
 template<typename Socket>
-string dialog::receive_sync(Socket& socket, bool raw)
+std::string dialog::receive_sync(Socket& socket, bool raw)
 {
     try
     {
         read_until(socket, *strmbuf_, "\n");
-        string line;
+        std::string line;
         getline(*istrm_, line, '\n');
         if (!raw)
             trim_if(line, is_any_of("\r\n"));
@@ -158,10 +157,10 @@ void dialog::connect_async()
 
 
 template<typename Socket>
-void dialog::send_async(Socket& socket, string line)
+void dialog::send_async(Socket& socket, std::string line)
 {
     check_timeout();
-    string l = line + "\r\n";
+    std::string l = line + "\r\n";
     bool has_written{false}, send_error{false};
     error_code errc;
     async_write(socket, buffer(l, l.size()),
@@ -178,11 +177,11 @@ void dialog::send_async(Socket& socket, string line)
 
 
 template<typename Socket>
-string dialog::receive_async(Socket& socket, bool raw)
+std::string dialog::receive_async(Socket& socket, bool raw)
 {
     check_timeout();
     bool has_read{false}, receive_error{false};
-    string line;
+    std::string line;
     error_code errc;
     async_read_until(socket, *strmbuf_, "\n",
         [&has_read, &receive_error, this, &line, &errc, raw](const error_code& error, size_t)
@@ -233,7 +232,7 @@ void dialog::timeout_handler(const error_code& error)
 }
 
 
-dialog_ssl::dialog_ssl(io_context& ios, const string& hostname, unsigned port, milliseconds timeout, const ssl_options_t& options) :
+dialog_ssl::dialog_ssl(io_context& ios, const std::string& hostname, unsigned port, milliseconds timeout, const ssl_options_t& options) :
     dialog(ios, hostname, port, timeout), ssl_(false), context_(make_shared<context>(options.method)),
     ssl_socket_(make_shared<asio::ssl::stream<tcp::socket&>>(*socket_, *context_))
 {
@@ -257,7 +256,7 @@ dialog_ssl::dialog_ssl(const dialog& other, const ssl_options_t& options) : dial
 }
 
 
-void dialog_ssl::send(const string& line)
+void dialog_ssl::send(const std::string& line)
 {
     if (!ssl_)
     {
@@ -272,7 +271,7 @@ void dialog_ssl::send(const string& line)
 }
 
 
-string dialog_ssl::receive(bool raw)
+std::string dialog_ssl::receive(bool raw)
 {
     if (!ssl_)
         return dialog::receive(raw);
@@ -297,7 +296,7 @@ shared_ptr<dialog_ssl> dialog_ssl::to_ssl(const shared_ptr<dialog> dlg, const di
 }
 
 
-string dialog_error::details() const
+std::string dialog_error::details() const
 {
     return details_;
 }
